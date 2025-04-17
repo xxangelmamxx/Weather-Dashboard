@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import {
   LineChart,
   Line,
@@ -7,70 +7,79 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-} from "recharts";
+} from 'recharts';
 
-const DetailView = () => {
+const API_KEY = import.meta.env.VITE_APP_API_KEY;
+
+export default function DetailView() {
   const { datetime } = useParams();
   const location = useLocation();
   const forecast = location.state?.forecast;
+  const cityFromState = location.state?.city;
+  const city = cityFromState || localStorage.getItem('city') || 'New York';
+
+  const [detailData, setDetailData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    localStorage.setItem('city', city);
+    if (!forecast) {
+      setLoading(false);
+      return;
+    }
+    const url = `https://api.weatherbit.io/v2.0/forecast/hourly?city=${encodeURIComponent(
+      city
+    )}&key=${API_KEY}&hours=24`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const hourly = data.data || [];
+        const filtered = hourly.filter(item =>
+          item.timestamp_local.startsWith(forecast.datetime)
+        );
+        setDetailData(
+          filtered.map(item => ({
+            time: item.timestamp_local.split('T')[1].slice(0, 5),
+            temp: item.temp,
+          }))
+        );
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [city, forecast]);
 
   if (!forecast) {
     return (
-      <div style={{ padding: "2rem" }}>
-        <h2>Detail View</h2>
-        <p>No forecast data available for {datetime}.</p>
-        <p>
-          Please go back to <Link to="/">Dashboard</Link> and select a forecast.
-        </p>
+      <div style={{ padding: '2rem' }}>
+        <h2>No forecast for {datetime}</h2>
+        <Link to="/">← Back</Link>
       </div>
     );
   }
 
-  const detailData = [
-    { time: "Morning", temp: forecast.temp - 2 },
-    { time: "Noon", temp: forecast.temp },
-    { time: "Evening", temp: forecast.temp + 1 },
-  ];
-
   return (
-    <div style={{ padding: "2rem", maxWidth: "800px" }}>
-      <div
-        style={{
-          background: "rgba(255,255,255,0.1)",
-          backdropFilter: "blur(10px)",
-          border: "1px solid rgba(255,255,255,0.2)",
-          borderRadius: "6px",
-          padding: "1rem",
-          marginBottom: "1rem",
-        }}
-      >
-        <h2>Detail for {forecast.datetime}</h2>
-        <p>{forecast.weather.description}</p>
-        <p>
-          <strong>Temperature:</strong> {forecast.temp}°C
-        </p>
-      </div>
+    <div style={{ padding: '2rem' }}>
+      <Link to="/">← Back to {city}</Link>
+      <h2>
+        {city} – {forecast.datetime}
+      </h2>
+      <p>{forecast.weather.description}</p>
 
-      <div
-        style={{
-          background: "rgba(255,255,255,0.1)",
-          backdropFilter: "blur(10px)",
-          border: "1px solid rgba(255,255,255,0.2)",
-          borderRadius: "6px",
-          padding: "1rem",
-        }}
-      >
-        <h3>Temperature Throughout the Day</h3>
-        <LineChart width={500} height={300} data={detailData}>
+      <h3>Hourly Temperature Trend</h3>
+      {loading ? (
+        <p>Loading…</p>
+      ) : detailData.length > 0 ? (
+        <LineChart width={700} height={300} data={detailData}>
           <XAxis dataKey="time" stroke="#fff" />
           <YAxis stroke="#fff" />
           <Tooltip />
           <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
           <Line type="monotone" dataKey="temp" stroke="#ff7300" />
         </LineChart>
-      </div>
+      ) : (
+        <p>No hourly data available.</p>
+      )}
     </div>
   );
-};
-
-export default DetailView;
+}
