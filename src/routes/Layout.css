@@ -1,0 +1,57 @@
+/* src/routes/Layout.css */
+.layout-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+  }
+  
+  .sidebar {
+    width: 220px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 1.5rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+  }
+  
+  .logo {
+    margin: 0 0 1rem 0;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar nav li {
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar nav li a {
+    text-decoration: none;
+    color: #ffffff;
+    padding: 0.5rem 0.75rem;
+    display: block;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  
+  .sidebar nav li a:hover,
+  .sidebar nav li .active-link {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+    overflow-y: auto;
+    height: calc(100vh - 2rem);
+  }
+  
