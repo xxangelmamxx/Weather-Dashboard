@@ -27,7 +27,7 @@ export default function TempComparison() {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h2>7‑Day Comparison for {city}</h2>
+      <h2>16‑Day Comparison for {city}</h2>
       <BarChart width={700} height={300} data={data}>
         <XAxis dataKey="datetime" stroke="#fff" />
         <YAxis stroke="#fff" />

@@ -28,7 +28,7 @@ export default function TempTrend() {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h2>7‑Day Trend for {city}</h2>
+      <h2>16‑Day Trend for {city}</h2>
       <LineChart width={700} height={300} data={data}>
         <XAxis dataKey="datetime" stroke="#fff" />
         <YAxis stroke="#fff" />
